@@ -30,26 +30,23 @@ int main()
         user.DisplayUserStats();
         menu.DisplayMainMenu();
         utility.SafeRead(cin, user_input);
-
-        cout << endl;
-
         // Switch block for different menu options
         switch (user_input)
         {
         case 1: // Length conversion
-            utility.PerformConversion(user, menu, user_input, &MenuFunctions::DisplayLengthFromMenu, &MenuFunctions::DisplayLengthToMenu);
+            utility.PerformConversion(user, menu, 1, &MenuFunctions::DisplayLengthFromMenu, &MenuFunctions::DisplayLengthToMenu);
             break;
         case 2: // Temperature conversion
-            utility.PerformConversion(user, menu, user_input, &MenuFunctions::DisplayTemperatureFromMenu, &MenuFunctions::DisplayTemperatureToMenu);
+            utility.PerformConversion(user, menu, 2, &MenuFunctions::DisplayTemperatureFromMenu, &MenuFunctions::DisplayTemperatureToMenu);
             break;
         case 3: // Area conversion
-            utility.PerformConversion(user, menu, user_input, &MenuFunctions::DisplayAreaFromMenu, &MenuFunctions::DisplayAreaToMenu);
+            utility.PerformConversion(user, menu, 3, &MenuFunctions::DisplayAreaFromMenu, &MenuFunctions::DisplayAreaToMenu);
             break;
         case 4: // Volume conversion
-            utility.PerformConversion(user, menu, user_input, &MenuFunctions::DisplayVolumeFromMenu, &MenuFunctions::DisplayVolumeToMenu);
+            utility.PerformConversion(user, menu, 4, &MenuFunctions::DisplayVolumeFromMenu, &MenuFunctions::DisplayVolumeToMenu);
             break;
         case 5: // Weight conversion
-            utility.PerformConversion(user, menu, user_input, &MenuFunctions::DisplayWeightFromMenu, &MenuFunctions::DisplayWeightToMenu);
+            utility.PerformConversion(user, menu, 5, &MenuFunctions::DisplayWeightFromMenu, &MenuFunctions::DisplayWeightToMenu);
             break;
         case 6: // Display help menu
             menu.DisplayHelpMenu();
