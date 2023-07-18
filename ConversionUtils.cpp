@@ -25,31 +25,27 @@ void ConversionUtils::SafeRead(std::istream &in, T &value)
         std::string inputStr;
         getline(in, inputStr);
 
-        // If the input string is empty, consider it as an invalid input
+        // If the input string is empty, throw an exception
         if (inputStr.empty())
         {
-            std::cout << "Input is empty. Try again: ";
-            continue;
+            throw std::invalid_argument("Input is empty. Try again.");
         }
 
-        // Check if the input is too long to possibly fit in a long long
-        // 19 is the max number of digits a long long can have
-        // +1 for the possible negative sign
+        // If the input is too long to possibly fit in a long long, throw an exception
         if (inputStr.length() > 20)
         {
-            std::cout << "Input value is too large. Try again: ";
-            continue;
+            throw std::invalid_argument("Input value is too large. Try again.");
         }
 
         std::istringstream iss(inputStr);
         iss >> value;
 
-        // If the read operation failed, the input is invalid
+        // If the read operation failed, throw an exception
         if (iss.fail() || iss.peek() != EOF)
         {
-            std::cout << "Invalid input. Try again: ";
-            continue;
+            throw std::invalid_argument("Invalid input. Try again.");
         }
+ 
         // After successfully reading a value, clear the input buffer completely
         in.clear();
         break;
@@ -65,25 +61,32 @@ void ConversionUtils::SelectUnit(User &user, MenuFunctions &menu, int conversion
 
     while (true)
     {
-        menu.ClearScreen();
-        user.DisplayUserStats();
-        (menu.*displayMenu)(page);
-        cout << "Select the " << (isFromUnit ? "starting" : "ending") << " unit: ";
-        SafeRead(cin, unit);
+        try
+        {
+            menu.ClearScreen();
+            user.DisplayUserStats();
+            (menu.*displayMenu)(page);
+            cout << "Select the " << (isFromUnit ? "starting" : "ending") << " unit: ";
+            SafeRead(cin, unit);
 
-        if (isFromUnit)
-            user.SetConvertFromUnit(menu.GetUnitName(conversionType, page, unit));
-        else
-            user.SetConvertToUnit(menu.GetUnitName(conversionType, page, unit));
+            if (isFromUnit)
+                user.SetConvertFromUnit(menu.GetUnitName(conversionType, page, unit));
+            else
+                user.SetConvertToUnit(menu.GetUnitName(conversionType, page, unit));
 
-        if (unit >= 1 && unit <= 7)
-            break;
-        else if (unit == 8)
-            page++;
-        else if (unit == 9 && page > 1)
-            page--;
-        else
-            menu.BadEntry(user);
+            if (unit >= 1 && unit <= 7)
+                break;
+            else if (unit == 8)
+                page++;
+            else if (unit == 9 && page > 1)
+                page--;
+            else
+                menu.BadEntry(user);
+        }
+        catch (const std::invalid_argument &e)
+        {
+            cout << e.what() << '\n';
+        }
     }
 }
 
@@ -91,18 +94,25 @@ void ConversionUtils::SelectUnit(User &user, MenuFunctions &menu, int conversion
 void ConversionUtils::PerformConversion(User &user, MenuFunctions &menu, int conversionType,
                                         void (MenuFunctions::*displayFromMenu)(int), void (MenuFunctions::*displayToMenu)(int))
 {
-    SelectUnit(user, menu, conversionType, displayFromMenu, true);
-    SelectUnit(user, menu, conversionType, displayToMenu, false);
+    try
+    {
+        SelectUnit(user, menu, conversionType, displayFromMenu, true);
+        SelectUnit(user, menu, conversionType, displayToMenu, false);
 
-    double value;
-    cout << "Enter the value to convert: ";
-    SafeRead(cin, value);
-    user.SetConversionType(conversionType);
-    user.SetValueToConvert(value);
+        double value;
+        cout << "Enter the value to convert: ";
+        SafeRead(cin, value);
+        user.SetConversionType(conversionType);
+        user.SetValueToConvert(value);
 
-    double result = user.ConvertValue();
+        double result = user.ConvertValue();
 
-    cout << "The result is: " << result << " " << user.GetConvertToUnit() << endl;
-    user.ClearStats();
-    WaitForUser();
+        cout << "The result is: " << result << " " << user.GetConvertToUnit() << endl;
+        user.ClearStats();
+        WaitForUser();
+    }
+    catch (const std::invalid_argument &e)
+    {
+        cout << e.what() << '\n';
+    }
 }
